@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_app/screens/home_page.dart';
+import 'package:to_do_app/screens/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity
             .adaptivePlatformDensity, // Adaptive layout across devices
       ),
-      home: const HomePage(),
+      home: const ProfileScreen(),
     );
   }
 }

@@ -18,8 +18,7 @@ class ToDoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 25.0, vertical: 10.0), // Consistent padding
+      padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0), // Consistent padding
       child: Slidable(
         endActionPane: ActionPane(
           motion: const StretchMotion(), // Added const
@@ -29,14 +28,22 @@ class ToDoTile extends StatelessWidget {
               icon: Icons.delete,
               backgroundColor: Colors.red.shade300,
               borderRadius: BorderRadius.circular(12),
-            )
+            ),
           ],
         ),
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.yellow.shade100, // Lighter shade for better contrast
+            color: Colors.white, // Set background to white for better contrast
             borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3), // Light shadow for depth
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // Shadow position
+              ),
+            ],
           ),
           child: Row(
             children: [
@@ -44,7 +51,8 @@ class ToDoTile extends StatelessWidget {
               Checkbox(
                 value: taskCompleted,
                 onChanged: onChanged,
-                activeColor: Colors.black,
+                activeColor: Colors.deepPurpleAccent, // Deep purple accent
+                checkColor: Colors.white, // White check mark for contrast
               ),
 
               // Task name
@@ -54,11 +62,9 @@ class ToDoTile extends StatelessWidget {
                   taskName,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight:
-                        FontWeight.w500, // Slightly bolder for readability
-                    decoration: taskCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
+                    fontWeight: FontWeight.w500, // Slightly bolder for readability
+                    color: taskCompleted ? Colors.grey : Colors.black, // Color changes based on completion
+                    decoration: taskCompleted ? TextDecoration.lineThrough : TextDecoration.none,
                   ),
                   overflow: TextOverflow.ellipsis, // Prevents overflow issues
                 ),
