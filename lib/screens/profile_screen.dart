@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_app/data/database.dart';
-import 'package:fl_chart/fl_chart.dart'; // Import fl_chart package
+import 'package:to_do_app/screens/home_page.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,7 +15,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ImagePicker _picker = ImagePicker();
   File? _image; // Store selected image
-  String _userName = "Adeel Arif";
+  String _userName = "Adeel Arif"; // Default user name
   ToDoDataBase db = ToDoDataBase();
 
   @override
@@ -33,22 +33,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  void _editProfile() {
+    // Implement logic for editing the profile (e.g., show dialog)
+    showDialog(
+      context: context,
+      builder: (context) {
+        TextEditingController nameController =
+            TextEditingController(text: _userName);
+        return AlertDialog(
+          title: const Text('Edit Profile'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _userName = nameController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.white),
         ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const HomePage()));
+          },
+        ),
+        backgroundColor: Colors.deepPurple,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Circular Avatar
+            // User Profile Section
             Center(
               child: GestureDetector(
                 onTap: _pickImage,
@@ -65,153 +110,165 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // User Name
-            Text(
-              _userName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                _userName,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: ElevatedButton(
+                onPressed: _editProfile,
+                child: const Text(
+                  'Edit Profile',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple, // Button color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Charts for Task Statistics
+            // Task Summary Section
+            const Text(
+              'Task Summary',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Task Grid View
             Expanded(
-              child: Column(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Task Statistics',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  // Completed Tasks Grid
+                  Expanded(
+                    child: _taskSummaryContainer(
+                      title: 'Completed Tasks',
+                      color: Colors.green.shade100,
+                      taskCount:
+                          db.toDoList.where((task) => task[1] == true).length,
+                      taskBuilder: (index) {
+                        final completedTask = db.toDoList
+                            .where((task) => task[1] == true)
+                            .toList()[index];
+                        return _taskCard(completedTask[0]);
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  _buildTaskStatisticsChart(),
-                  const SizedBox(height: 20),
+                  const SizedBox(width: 10),
 
-                  // Task Grid View
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Completed Tasks Grid
-                      _buildTaskGrid('Completed Tasks', true),
-                      const SizedBox(width: 10),
-
-                      // Pending Tasks Grid
-                      _buildTaskGrid('Pending Tasks', false),
-                    ],
+                  // Pending Tasks Grid
+                  Expanded(
+                    child: _taskSummaryContainer(
+                      title: 'Pending Tasks',
+                      color: Colors.red.shade100,
+                      taskCount:
+                          db.toDoList.where((task) => task[1] == false).length,
+                      taskBuilder: (index) {
+                        final pendingTask = db.toDoList
+                            .where((task) => task[1] == false)
+                            .toList()[index];
+                        return _taskCard(pendingTask[0]);
+                      },
+                    ),
                   ),
                 ],
               ),
             ),
+
+            // Logout Button
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Implement logout logic
+                },
+                child: const Text('Logout'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white, // Button color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Builds the statistics chart for completed and pending tasks using fl_chart
-  Widget _buildTaskStatisticsChart() {
-    int completedCount = db.toDoList.where((task) => task[1] == true).length;
-    int pendingCount = db.toDoList.where((task) => task[1] == false).length;
-
-    return SizedBox(
-      height: 150,
-      child: BarChart(
-        BarChartData(
-          barGroups: [
-            BarChartGroupData(
-              x: 0,
-              barRods: [
-                BarChartRodData(
-                  toY: completedCount.toDouble(),
-                  color: Colors.green,
-                ),
-              ],
-            ),
-            BarChartGroupData(
-              x: 1,
-              barRods: [
-                BarChartRodData(
-                  toY: pendingCount.toDouble(),
-                  color: Colors.red,
-                ),
-              ],
-            ),
-          ],
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  switch (value.toInt()) {
-                    case 0:
-                      return const Text('Completed');
-                    case 1:
-                      return const Text('Pending');
-                    default:
-                      return const Text('');
-                  }
-                },
+  Widget _taskSummaryContainer({
+    required String title,
+    required Color color,
+    required int taskCount,
+    required Widget Function(int) taskBuilder,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 5,
+            offset: const Offset(2, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.5,
               ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true),
+              itemCount: taskCount,
+              itemBuilder: (context, index) => taskBuilder(index),
             ),
           ),
-          borderData: FlBorderData(show: false),
-        ),
+        ],
       ),
     );
   }
 
-  // Builds a grid view for completed or pending tasks
-  Widget _buildTaskGrid(String title, bool isCompleted) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: isCompleted ? Colors.green.shade100 : Colors.red.shade100,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.5,
-                ),
-                itemCount:
-                    db.toDoList.where((task) => task[1] == isCompleted).length,
-                itemBuilder: (context, index) {
-                  final task = db.toDoList
-                      .where((task) => task[1] == isCompleted)
-                      .toList()[index];
-                  return Card(
-                    child: Center(
-                      child: Text(task[0]),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+  Widget _taskCard(String taskName) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            taskName,
+            style: const TextStyle(fontSize: 16),
+          ),
         ),
       ),
     );
   }
-}
-
-// Model for task data
-class TaskData {
-  final String taskStatus;
-  final int taskCount;
-
-  TaskData(this.taskStatus, this.taskCount);
 }

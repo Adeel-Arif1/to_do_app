@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_app/data/database.dart';
 import 'package:to_do_app/screens/profile_screen.dart';
+import 'package:to_do_app/screens/setting_screen.dart';
 import 'package:to_do_app/utils/dialogue_box.dart';
 import 'package:to_do_app/utils/to_do_tile.dart';
 
@@ -37,8 +38,7 @@ class _HomePageState extends State<HomePage>
   @override
   void dispose() {
     _animationController.dispose();
-    _controller
-        .dispose(); // Dispose the controller as well to prevent memory leaks
+    _controller.dispose();
     super.dispose();
   }
 
@@ -51,6 +51,16 @@ class _HomePageState extends State<HomePage>
       ),
       backgroundColor: Colors.deepPurple,
       elevation: 0,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        },
+      ),
     );
   }
 
@@ -75,21 +85,17 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-// Floating Action Button
+  // Floating Action Button
   FloatingActionButton _buildFAB() {
     return FloatingActionButton(
       onPressed: () {
         createNewTask();
-        // If using an animation controller, ensure it's initialized and available.
-        // _animationController.forward(); // Uncomment if using animation controller
       },
-      backgroundColor: Colors.deepPurple, // Set to deep purple
-      child:
-          const Icon(Icons.add, color: Colors.white), // White icon for contrast
+      backgroundColor: Colors.deepPurple,
+      child: const Icon(Icons.add, color: Colors.white),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30.0), // Circular border radius
-        side: BorderSide(
-            color: Colors.white, width: 3), // Optional: border color and width
+        borderRadius: BorderRadius.circular(30.0),
+        side: BorderSide(color: Colors.white, width: 3),
       ),
     );
   }
@@ -117,15 +123,33 @@ class _HomePageState extends State<HomePage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ProfileScreen()),
-                );
-              },
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                ).then((_) {
+                  setState(() {
+                    // Reload tasks when coming back from profile
+                    db.loadData();
+                  });
+                });
+              }, //SettingsScreen
             ),
-            const SizedBox(width: 40), // Space for the floating button
+            const SizedBox(width: 40),
             IconButton(
               icon: const Icon(Icons.settings),
               color: Colors.white,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                ).then((_) {
+                  setState(() {
+                    // Reload tasks when coming back from profile
+                    db.loadData();
+                  });
+                });
+              },
             ),
             IconButton(
               icon: const Icon(Icons.info),
