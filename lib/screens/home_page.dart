@@ -19,13 +19,14 @@ class _HomePageState extends State<HomePage>
   final _controller = TextEditingController();
   ToDoDataBase db = ToDoDataBase();
   late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
     if (_myBox.get("TODOLIST") == null) {
       db.createInitialData();
     } else {
-      db.loadData();
+      db.loadData(); // No need for 'await' if loadData doesn't return a Future
     }
     setState(() {}); // Force rebuild after loading data
 
@@ -131,7 +132,7 @@ class _HomePageState extends State<HomePage>
                     db.loadData();
                   });
                 });
-              }, //SettingsScreen
+              },
             ),
             const SizedBox(width: 40),
             IconButton(
