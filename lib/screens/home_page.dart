@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage>
   final _controller = TextEditingController();
   ToDoDataBase db = ToDoDataBase();
   late AnimationController _animationController;
-
   @override
   void initState() {
     super.initState();
@@ -28,7 +27,8 @@ class _HomePageState extends State<HomePage>
     } else {
       db.loadData();
     }
-    // Initialize the animation controller
+    setState(() {}); // Force rebuild after loading data
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,

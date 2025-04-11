@@ -16,35 +16,40 @@ class DialogBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.yellow[300],
+      backgroundColor: Colors.deepPurple[300], // Match app theme
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       content: SingleChildScrollView(
-        child: SizedBox(
-          height: 120, // Set consistent height
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Input field for new task
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Add a new task",
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Input field
+            TextField(
+              controller: controller,
+              cursorColor: Colors.white,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.deepPurple[400],
+                hintText: "Add a new task",
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
+            ),
+            const SizedBox(height: 16),
 
-              // Save and Cancel buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  // Save button
-                  MyButton(text: "Save", onPressed: onSave),
-                  const SizedBox(width: 8), // Spacing between buttons
-                  // Cancel button
-                  MyButton(text: "Cancel", onPressed: onCancel),
-                ],
-              ),
-            ],
-          ),
+            // Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                MyButton(text: "Save", onPressed: onSave),
+                const SizedBox(width: 8),
+                MyButton(text: "Cancel", onPressed: onCancel),
+              ],
+            ),
+          ],
         ),
       ),
     );

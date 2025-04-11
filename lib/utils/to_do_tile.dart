@@ -18,56 +18,76 @@ class ToDoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0), // Consistent padding
+      padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
       child: Slidable(
         endActionPane: ActionPane(
-          motion: const StretchMotion(), // Added const
+          motion: const StretchMotion(),
           children: [
             SlidableAction(
               onPressed: deleteFunction,
               icon: Icons.delete,
-              backgroundColor: Colors.red.shade300,
-              borderRadius: BorderRadius.circular(12),
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              borderRadius: BorderRadius.circular(16),
             ),
           ],
         ),
         child: Container(
-          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white, // Set background to white for better contrast
-            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              colors: [
+                Colors.deepPurple.shade400,
+                Colors.deepPurple.shade700,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.3), // Light shadow for depth
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3), // Shadow position
+                color: Colors.deepPurple.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           child: Row(
             children: [
-              // Checkbox
-              Checkbox(
-                value: taskCompleted,
-                onChanged: onChanged,
-                activeColor: Colors.deepPurpleAccent, // Deep purple accent
-                checkColor: Colors.white, // White check mark for contrast
+              // Animated Checkbox
+              Transform.scale(
+                scale: 1.2,
+                child: Checkbox(
+                  value: taskCompleted,
+                  onChanged: onChanged,
+                  activeColor: Colors.white,
+                  checkColor: Colors.deepPurple,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
               ),
+
+              const SizedBox(width: 12),
 
               // Task name
               Expanded(
-                // Ensures task name doesn't overflow
                 child: Text(
                   taskName,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500, // Slightly bolder for readability
-                    color: taskCompleted ? Colors.grey : Colors.black, // Color changes based on completion
-                    decoration: taskCompleted ? TextDecoration.lineThrough : TextDecoration.none,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    decoration: taskCompleted ? TextDecoration.lineThrough : null,
                   ),
-                  overflow: TextOverflow.ellipsis, // Prevents overflow issues
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
+
+              // Status icon
+              Icon(
+                taskCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: Colors.white70,
               ),
             ],
           ),
